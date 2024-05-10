@@ -89,7 +89,7 @@ def exit_handler(signal=None, stack_frame=None):
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
     Running = False
 
-atexit.register(exit_handler)
+#atexit.register(exit_handler)
 signal.signal(signal.SIGTERM, exit_handler)
 signal.signal(signal.SIGINT, exit_handler)
 
