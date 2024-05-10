@@ -28,7 +28,7 @@ logger.addHandler(console_handler)
 def execute_script(script_path):
     try:
         subprocess.run(['bash', script_path], check=True)
-        logging.info(f'Successfully executed {script_path}')
+#        logging.info(f'Successfully executed {script_path}')
     except subprocess.CalledProcessError as e:
         logging.error(f'Execution of {script_path} failed with error: {e}')
 
@@ -41,6 +41,7 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of
             script_path = os.path.join(folder, file)
             if folder == 'every-minute':
                 schedule.every(10).seconds.do(execute_script, script_path)
+                execute_script(script_path)
             elif folder == 'weekly':
                 schedule.every().day.at(time_of_day).do(
                     execute_script, script_path).day.at(day_of_week)
