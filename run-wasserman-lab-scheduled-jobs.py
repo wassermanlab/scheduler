@@ -85,6 +85,7 @@ def exit_handler(a, b):
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
+    quit()
 
 atexit.register(exit_handler)
 signal.signal(signal.SIGTERM, exit_handler)
