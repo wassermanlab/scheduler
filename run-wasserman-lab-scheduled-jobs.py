@@ -85,19 +85,22 @@ def exit_handler(a, b):
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
-    quit()
+    raise SystemExit
 
 atexit.register(exit_handler)
 signal.signal(signal.SIGTERM, exit_handler)
 signal.signal(signal.SIGINT, exit_handler)
 
-while True:
-        
-    scan_and_schedule('every-minute')
-    scan_and_schedule('daily')
-    scan_and_schedule('weekly')
-    scan_and_schedule('monthly')
-    schedule.run_pending()
-    check_for_deleted_scripts()
-    time.sleep(10)
+try:
+    while True:
+            
+        scan_and_schedule('every-minute')
+        scan_and_schedule('daily')
+        scan_and_schedule('weekly')
+        scan_and_schedule('monthly')
+        schedule.run_pending()
+        check_for_deleted_scripts()
+        time.sleep(10)
 
+except SystemExit:
+    pass
