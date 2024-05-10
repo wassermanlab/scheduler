@@ -47,7 +47,7 @@ def execute_script(script_path):
 
 
 
-def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of_day='00:00'):
+def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of_day='12:34'):
 
     for file in os.listdir(folder):
         if file.endswith('.sh'):
@@ -55,6 +55,9 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of
             if folder == 'every-minute':
                 schedule.every(60).seconds.do(execute_script, script_path)
                 execute_script(script_path)
+            elif folder == 'daily':
+                schedule.every().day.at(time_of_day).do(
+                    execute_script, script_path)
             elif folder == 'weekly':
                 schedule.every().day.at(time_of_day).do(
                     execute_script, script_path).day.at(day_of_week)
@@ -65,8 +68,9 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of
 
 # Scan and schedule tasks for every-minute, weekly, and monthly folders
 scan_and_schedule('every-minute')
-scan_and_schedule('weekly', day_of_week='wednesday', time_of_day='10:00')
-scan_and_schedule('monthly', day_of_month='1', time_of_day='10:00')
+scan_and_schedule('daily')
+scan_and_schedule('weekly')
+scan_and_schedule('monthly')
 start_time = datetime.datetime.now()
 logging.info(f"starting scheduler")
 
