@@ -45,46 +45,57 @@ def execute_script(script_path):
     except subprocess.CalledProcessError as e:
         logging.error(f'Execution of {script_path} failed with error: {e}')
 
-
+already_scheduled = {}
 
 def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of_day='12:34'):
 
     for file in os.listdir(folder):
         if file.endswith('.sh'):
             script_path = os.path.join(folder, file)
+            if script_path in already_scheduled:
+                continue
+            job = None
             if folder == 'every-minute':
-                schedule.every(60).seconds.do(execute_script, script_path)
+                job = schedule.every(10).seconds.do(execute_script, script_path)
                 execute_script(script_path)
             elif folder == 'daily':
-                schedule.every().day.at(time_of_day).do(
+                job = schedule.every().day.at(time_of_day).do(
                     execute_script, script_path)
             elif folder == 'weekly':
-                schedule.every().day.at(time_of_day).do(
+                job = schedule.every().day.at(time_of_day).do(
                     execute_script, script_path).day.at(day_of_week)
             elif folder == 'monthly':
-                schedule.every().day.at(time_of_day).do(
+                job = schedule.every().day.at(time_of_day).do(
                     execute_script, script_path).day.at(int(day_of_month))
-
-
-# Scan and schedule tasks for every-minute, weekly, and monthly folders
-scan_and_schedule('every-minute')
-scan_and_schedule('daily')
-scan_and_schedule('weekly')
-scan_and_schedule('monthly')
-start_time = datetime.datetime.now()
-logging.info(f"starting scheduler")
-
+                
+            already_scheduled[script_path] = job
+            logger.info(f'Scheduled {script_path}')
+        
+def check_for_deleted_scripts():
+    for script_path in list(already_scheduled.keys()):
+        if not os.path.exists(script_path):
+            logging.info(f"Cancel {script_path}")
+            schedule.cancel_job(already_scheduled[script_path])
+            del already_scheduled[script_path]
 
 def exit_handler():
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
 
-atexit.register(exit_handler)
+start_time = datetime.datetime.now()
+logging.info(f"starting scheduler")
+
 signal.signal(signal.SIGTERM, exit_handler)
 signal.signal(signal.SIGINT, exit_handler)
 
 while True:
+        
+    scan_and_schedule('every-minute')
+    scan_and_schedule('daily')
+    scan_and_schedule('weekly')
+    scan_and_schedule('monthly')
     schedule.run_pending()
-    time.sleep(1)
+    check_for_deleted_scripts()
+    time.sleep(10)
 
