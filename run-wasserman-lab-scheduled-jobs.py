@@ -78,13 +78,14 @@ def check_for_deleted_scripts():
             schedule.cancel_job(already_scheduled[script_path])
             del already_scheduled[script_path]
 
+start_time = datetime.datetime.now()
+logging.info(f"starting scheduler")
+
 def exit_handler():
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
 
-start_time = datetime.datetime.now()
-logging.info(f"starting scheduler")
 
 signal.signal(signal.SIGTERM, exit_handler)
 signal.signal(signal.SIGINT, exit_handler)
