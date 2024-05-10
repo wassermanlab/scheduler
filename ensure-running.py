@@ -1,6 +1,17 @@
 import os
 import psutil
 import subprocess
+import argparse
+
+parser = argparse.ArgumentParser(description='Check for -slurm flag')
+parser.add_argument('-slurm', action='store_true', help='a flag to indicate if the script is run with slurm')
+args = parser.parse_args()
+use_slurm = args.slurm
+if (use_slurm):
+    print("using slurm")
+else:
+    print("NOT using slurm")
+
 
 def is_running(script_path):
     script_name = os.path.basename(script_path)
@@ -14,7 +25,10 @@ def is_running(script_path):
 def run_script(script_path):
     if not is_running(script_path):
         try:
-            subprocess.Popen(['pipenv', 'run', 'python', script_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            command = ['pipenv', 'run', 'python', script_path]
+            if use_slurm:
+                command.append('-slurm')
+            subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print("Started the scheduling script")
         except Exception as e:
             print(f"Error starting script: {e}")

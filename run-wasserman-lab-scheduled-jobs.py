@@ -6,6 +6,16 @@ import logging
 import datetime
 import atexit
 import signal
+import argparse
+
+parser = argparse.ArgumentParser(description='Check for -slurm flag')
+parser.add_argument('-slurm', action='store_true', help='a flag to indicate if the script is run with slurm')
+args = parser.parse_args()
+use_slurm = args.slurm
+if (use_slurm):
+    print("scripts will be run using slurm")
+else:
+    print("scripts will not be run using slurm")
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,7 +37,10 @@ logger.addHandler(console_handler)
 # Function to execute the given shell script
 def execute_script(script_path):
     try:
-        subprocess.run(['bash', script_path], check=True)
+        if use_slurm:
+            subprocess.run(['sbatch', script_path], check=True)
+        else:
+            subprocess.run(['bash', script_path], check=True)
 #        logging.info(f'Successfully executed {script_path}')
     except subprocess.CalledProcessError as e:
         logging.error(f'Execution of {script_path} failed with error: {e}')
