@@ -62,11 +62,11 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of
                 job = schedule.every().day.at(time_of_day).do(
                     execute_script, script_path)
             elif folder == 'weekly':
-                job = schedule.every().day.at(time_of_day).do(
-                    execute_script, script_path).day.at(day_of_week)
+                job = getattr(schedule.every(), day_of_week).at(time_of_day).do(
+                    execute_script, script_path)
             elif folder == 'monthly':
-                job = schedule.every().day.at(time_of_day).do(
-                    execute_script, script_path).day.at(int(day_of_month))
+                job = schedule.every(int(day_of_month)).days.at(time_of_day).do(
+                    execute_script, script_path)
                 
             already_scheduled[script_path] = job
             logger.info(f'Scheduled {script_path}')
@@ -81,7 +81,7 @@ def check_for_deleted_scripts():
 start_time = datetime.datetime.now()
 logging.info(f"starting scheduler")
 
-def exit_handler():
+def exit_handler(a, b):
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
