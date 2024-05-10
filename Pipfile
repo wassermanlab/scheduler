@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 python-dotenv = "*"
+schedule = "*"
+psutil = "*"
 
 [dev-packages]
 
