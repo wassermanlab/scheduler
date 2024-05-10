@@ -81,7 +81,7 @@ def check_for_deleted_scripts():
 start_time = datetime.datetime.now()
 logging.info(f"starting scheduler")
 
-def exit_handler(a, b):
+def exit_handler(signal=None, stack_frame=None):
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
