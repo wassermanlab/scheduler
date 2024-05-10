@@ -85,7 +85,6 @@ def exit_handler(signal=None, stack_frame=None):
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
-    raise SystemExit
 
 atexit.register(exit_handler)
 signal.signal(signal.SIGTERM, exit_handler)
@@ -102,5 +101,6 @@ try:
         check_for_deleted_scripts()
         time.sleep(10)
 
-except SystemExit:
+except Exception as e:
+    logging.error(e)
     pass
