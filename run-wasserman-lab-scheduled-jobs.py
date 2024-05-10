@@ -81,17 +81,20 @@ def check_for_deleted_scripts():
 start_time = datetime.datetime.now()
 logging.info(f"starting scheduler")
 
+Running = True
 def exit_handler(signal=None, stack_frame=None):
+    global Running
     now = datetime.datetime.now()
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
+    Running = False
 
 atexit.register(exit_handler)
 signal.signal(signal.SIGTERM, exit_handler)
 signal.signal(signal.SIGINT, exit_handler)
 
 try:
-    while True:
+    while Running:
             
         scan_and_schedule('every-minute')
         scan_and_schedule('daily')
