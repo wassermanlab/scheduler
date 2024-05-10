@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-celery = {extras = ["redis"], version = "*"}
 python-dotenv = "*"
 
 [dev-packages]
