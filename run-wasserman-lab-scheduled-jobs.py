@@ -17,10 +17,18 @@ if (use_slurm):
 else:
     print("scripts will not be run using slurm")
 
+
+
+script_file = os.path.abspath(__file__)
+print(f"script_file: {script_file}")
+script_dir = os.path.dirname(script_file)
+print(f"script_dir: {script_dir}")
+
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-handler = logging.FileHandler('output.log')
+handler = logging.FileHandler(os.path.join(script_dir,'output.log'))
 handler.setLevel(logging.INFO)
 
 console_handler = logging.StreamHandler()
@@ -38,9 +46,9 @@ logger.addHandler(console_handler)
 def execute_script(script_path):
     try:
         if use_slurm:
-            subprocess.run(['sbatch', script_path], check=True)
+            subprocess.run(['sbatch', script_path], check=True,  cwd=os.path.join(script_dir, 'workspace'))
         else:
-            subprocess.run(['bash', script_path], check=True)
+            subprocess.run(['bash', script_path], check=True, cwd=os.path.join(script_dir, 'workspace'))
 #        logging.info(f'Successfully executed {script_path}')
     except subprocess.CalledProcessError as e:
         logging.error(f'Execution of {script_path} failed with error: {e}')
@@ -48,10 +56,10 @@ def execute_script(script_path):
 already_scheduled = {}
 
 def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of_day='12:34'):
-
-    for file in os.listdir(folder):
+    full_path = os.path.join(script_dir, folder)
+    for file in os.listdir(full_path):
         if file.endswith('.sh'):
-            script_path = os.path.join(folder, file)
+            script_path = os.path.join(full_path, file)
             if script_path in already_scheduled:
                 continue
             job = None
