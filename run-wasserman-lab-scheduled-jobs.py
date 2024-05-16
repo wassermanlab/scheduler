@@ -63,10 +63,7 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of
             if script_path in already_scheduled:
                 continue
             job = None
-            if folder == 'every-minute':
-                job = schedule.every(10).seconds.do(execute_script, script_path)
-                execute_script(script_path)
-            elif folder == 'daily':
+            if folder == 'daily':
                 job = schedule.every().day.at(time_of_day).do(
                     execute_script, script_path)
             elif folder == 'weekly':
@@ -104,7 +101,6 @@ signal.signal(signal.SIGINT, exit_handler)
 try:
     while Running:
             
-        scan_and_schedule('every-minute')
         scan_and_schedule('daily')
         scan_and_schedule('weekly')
         scan_and_schedule('monthly')
