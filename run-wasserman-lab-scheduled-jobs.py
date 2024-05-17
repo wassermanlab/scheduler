@@ -55,26 +55,25 @@ def execute_script(script_path):
 
 already_scheduled = {}
 
-def scan_and_schedule(folder, day_of_month='1', day_of_week='wednesday', time_of_day='12:34'):
+def scan_and_schedule(folder, day_of_month='1', day_of_week='monday', time_of_day='12:00'):
     full_path = os.path.join(script_dir, folder)
     for file in os.listdir(full_path):
         if file.endswith('.sh'):
             script_path = os.path.join(full_path, file)
-            if script_path in already_scheduled:
-                continue
-            job = None
-            if folder == 'daily':
-                job = schedule.every().day.at(time_of_day).do(
-                    execute_script, script_path)
-            elif folder == 'weekly':
-                job = getattr(schedule.every(), day_of_week).at(time_of_day).do(
-                    execute_script, script_path)
-            elif folder == 'monthly':
-                job = schedule.every(int(day_of_month)).days.at(time_of_day).do(
-                    execute_script, script_path)
-                
-            already_scheduled[script_path] = job
-            logger.info(f'Scheduled {script_path}')
+            if script_path not in already_scheduled:
+                job = None
+                if folder == 'daily':
+                    job = schedule.every().day.at(time_of_day).do(
+                        execute_script, script_path)
+                elif folder == 'weekly':
+                    job = getattr(schedule.every(), day_of_week).at(time_of_day).do(
+                        execute_script, script_path)
+                elif folder == 'monthly':
+                    job = schedule.every(int(day_of_month)).days.at(time_of_day).do(
+                        execute_script, script_path)
+                    
+                already_scheduled[script_path] = job
+                logger.info(f'Scheduled {script_path}')
         
 def check_for_deleted_scripts():
     for script_path in list(already_scheduled.keys()):
@@ -106,7 +105,8 @@ try:
         scan_and_schedule('monthly')
         schedule.run_pending()
         check_for_deleted_scripts()
-        time.sleep(10)
+        seconds_in_day = 24 * 60 * 60
+        time.sleep(seconds_in_day)
 
 except Exception as e:
     logging.error(e)
