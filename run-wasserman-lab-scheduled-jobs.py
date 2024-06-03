@@ -66,7 +66,7 @@ def scan_and_schedule(folder, day_of_month='1', day_of_week='monday', time_of_da
                 elif folder == 'weekly':
                     job = getattr(schedule.every(), day_of_week).at(time_of_day).do(execute_script, script_path)
                 elif folder == 'monthly':
-                    job = schedule.every(int(day_of_month)).month.at(time_of_day).do(execute_script, script_path)
+                    job = schedule.every().month.do(execute_script, script_path)
 
                 already_scheduled[script_path] = job
                 logger.info(f'Scheduled {script_path}')
