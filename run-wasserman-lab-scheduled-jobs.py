@@ -92,6 +92,7 @@ def exit_handler(signal=None, stack_frame=None):
     ran_for = now - start_time
     logger.info(f"Exiting scheduler. It ran for this long: {ran_for}")
     Running = False
+    quit()
 
 
 signal.signal(signal.SIGTERM, exit_handler)
